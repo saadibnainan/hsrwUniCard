@@ -44,7 +44,6 @@
 
   /* ── Layout ── */
   --nav-height:      64px;
-  --nav-float-gap:   14px;  /* margin between the floating nav pill and the screen edges */
   --top-bar-height:  58px;
   --radius-xs:       6px;
   --radius-sm:       10px;
@@ -316,49 +315,46 @@ body {
 
 /* ── Scroll Area ──
    Content runs the full height of the shell — including behind the top bar's
-   bottom edge and underneath the floating glass nav pill — so it's visible
-   (frosted) through both as the user scrolls, iOS-26 "Liquid Glass" style.
-   The bottom padding just keeps the LAST item scrollable clear of the pill. */
+   bottom edge and underneath the glass nav bar — so it's visible (frosted)
+   through both as the user scrolls, iOS-26 "Liquid Glass" style. The bottom
+   padding just keeps the LAST item scrollable clear of the bar. */
 .app-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  /* `max()`, not `+` — on devices with a home-indicator safe area, that inset
-     IS the bottom clearance; stacking the float-gap on top of it doubled the
-     space below the pill into a visible empty band. Devices without a safe
-     area (older iPhones, Android, desktop) fall back to the float-gap. */
-  padding-bottom: calc(var(--nav-height) + max(var(--nav-float-gap), env(safe-area-inset-bottom, 0px)) + 16px);
+  /* The bar's own height already bakes in the safe-area inset (see .bottom-nav),
+     so clearing it is just nav-height + inset + a little breathing room. */
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
   background: var(--bg-app);
 }
 
-/* ── Bottom Nav — floating liquid-glass pill ──
+/* ── Bottom Nav — docked liquid-glass bar ──
    Detached from .app-shell and pinned straight to the device viewport
    (not the shell's box, which iOS sizes unreliably on first standalone
-   launch and mid-scroll — that's what caused the gap under the old docked
-   bar). Floats above the content with margin on every side, like iOS 26's
-   redesigned tab bar / Telegram's rounded bar — content scrolls underneath
-   and shows through the frosted glass. */
+   launch and mid-scroll — that's what caused the original gap under the
+   bar). Sits flush against the bottom edge — no gap, no margin — with the
+   safe-area inset baked into its own height/padding so the glass surface
+   itself covers the home-indicator zone (iOS-26 "Liquid Glass" tab-bar
+   style: content scrolls underneath and shows through the frosted glass,
+   the bar's surface runs edge-to-edge with no void beneath it). */
 .bottom-nav {
   position: fixed;
-  /* Same `max()` reasoning as .app-content's padding: the safe-area inset
-     already clears the home indicator, so don't stack the float-gap on top
-     of it — that left a visible empty band between the pill and the screen
-     edge ("gaping underneath"). Use whichever clearance is larger. */
-  bottom: max(var(--nav-float-gap), env(safe-area-inset-bottom, 0px));
-  left: var(--nav-float-gap);
-  right: var(--nav-float-gap);
-  max-width: calc(430px - 2 * var(--nav-float-gap));
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 430px;
   margin-inline: auto;
-  height: var(--nav-height);
-  padding: 6px;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
   gap: 2px;
-  border-radius: 9999px;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   background: rgba(255,255,255,0.62);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 14px 38px rgba(26,23,27,0.16), inset 0 1px 0 rgba(255,255,255,0.55);
+  border-bottom: none;
+  box-shadow: 0 -8px 28px rgba(26,23,27,0.1), inset 0 1px 0 rgba(255,255,255,0.55);
   display: flex;
   align-items: stretch;
   z-index: 20;
@@ -800,6 +796,16 @@ body {
   align-items: flex-end;
   justify-content: center;
   animation: fadeIn 0.18s ease;
+}
+
+/* Hide the glass nav bar while a sheet is open — two sibling layers that both
+   use `backdrop-filter` (the bar's blur and the overlay's blur) composite
+   unpredictably on iOS WebKit and can paint out of z-index order, letting the
+   bar show through on top of the sheet and cover its action button. Removing
+   it from the layer entirely (rather than relying on stacking) sidesteps the
+   compositing bug and matches standard sheet/modal behaviour besides. */
+.app-shell:has(> .app-content .overlay) .bottom-nav {
+  display: none;
 }
 
 .sheet {
