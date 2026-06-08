@@ -1,0 +1,28 @@
+{
+  "name": "HSRW UniCard",
+  "short_name": "UniCard",
+  "description": "Unified digital student identity card for Hochschule Rhein-Waal — Deutschlandsemesterticket, Mensa wallet, Library pass, and NFC access.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F6FA",
+  "theme_color": "#28255A",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icon1.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

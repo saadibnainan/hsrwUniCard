@@ -27,6 +27,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
   const [loading,  setLoading]  = useState(false);
   const [bioOpen,  setBioOpen]  = useState(false);
   const [bioStep,  setBioStep]  = useState<0 | 1 | 2>(0);
+  const [showPw,   setShowPw]   = useState(false);
 
   const validate = (): string | null => {
     if (!email.trim()) return "Please enter your university email.";
@@ -56,7 +57,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
     setTimeout(() => setBioStep(2), 2300);
       setTimeout(() => {
         setBioOpen(false);
-        onLoginSuccess("mohammad-mushfiqur-rahman.joy@hsrw.org", "Mushfiqur Rahman");
+        onLoginSuccess("mushfiqur.joy@hsrw.org", "Mushfiqur Joy");
       }, 3100);
   };
 
@@ -109,19 +110,45 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
 
           <div>
             <label className="field-label" htmlFor="login-password">Password</label>
-            <input
-              id="login-password"
-              className="input"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setError(""); }}
-              autoComplete="current-password"
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                id="login-password"
+                className="input"
+                type={showPw ? "text" : "password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={e => { setPassword(e.target.value); setError(""); }}
+                autoComplete="current-password"
+                style={{ paddingRight: 48 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPw(s => !s)}
+                aria-label={showPw ? "Hide password" : "Show password"}
+                aria-pressed={showPw}
+                style={{
+                  position: "absolute", right: 4, top: "50%", transform: "translateY(-50%)",
+                  width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "transparent", border: "none", cursor: "pointer",
+                  color: "var(--text-muted)", touchAction: "manipulation"
+                }}
+              >
+                {showPw ? (
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88L3 3m6.88 6.88L21 21"/>
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
 
           {error && (
-            <div style={{
+            <div role="alert" style={{
               background: "#FBE8EC", border: "1px solid #F5C0CC",
               borderRadius: 8, padding: "10px 12px",
               fontSize: 13, color: "var(--hsrw-red)", display: "flex", gap: 8, alignItems: "flex-start"
@@ -171,16 +198,15 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
           Face ID / Touch ID
         </button>
 
-        {/* Demo hint */}
+        {/* Security note */}
         <div style={{
-          marginTop: 32, padding: "14px 16px",
-          background: "#F2F5FB", border: "1px solid #D9E2F5",
-          borderRadius: 10, fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.6
+          marginTop: 28, display: "flex", alignItems: "center", justifyContent: "center",
+          gap: 7, fontSize: 12, color: "var(--text-muted)"
         }}>
-          <strong style={{ color: "var(--hsrw-blue)" }}>Demo credentials</strong><br />
-          Email: <code style={{ background: "#E6ECF7", padding: "1px 4px", borderRadius: 4 }}>mohammad-mushfiqur-rahman.joy@hsrw.org</code><br />
-          Password: <code style={{ background: "#E6ECF7", padding: "1px 4px", borderRadius: 4 }}>Joy@1234</code>
-          <br />Or tap <strong>Face ID / Touch ID</strong> to skip login.
+          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          Protected by HSRW Single Sign-On
         </div>
       </div>
 

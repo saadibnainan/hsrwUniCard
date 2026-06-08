@@ -80,8 +80,13 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
         <div
           className={`id-card-scene${flipped ? " flipped" : ""}`}
           onClick={() => setFlipped(f => !f)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFlipped(f => !f); }
+          }}
           role="button"
-          aria-label="Tap to flip student ID card"
+          tabIndex={0}
+          aria-pressed={flipped}
+          aria-label={`Student ID card, showing ${flipped ? "back" : "front"}. Activate to flip.`}
         >
           <div className="id-card-inner">
 
@@ -93,15 +98,24 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
                 </div>
               )}
 
-              {/* Top row: logo + chip */}
+              {/* Top row: logo + contactless */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1 }}>
                 <div>
                   <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9, lineHeight: 1 }}>Hochschule</div>
                   <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9 }}>Rhein-Waal</div>
                   <div style={{ fontSize: 7, opacity: 0.5, marginTop: 1 }}>Rhine-Waal University of Applied Sciences</div>
                 </div>
-                {/* SIM chip */}
-                <div style={{ width: 26, height: 20, borderRadius: 3, background: "linear-gradient(135deg, #f0c040, #b8860b)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 1px 3px rgba(0,0,0,0.3)" }} />
+                {/* Contactless symbol */}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
+                  <path d="M5 8a9 9 0 0 1 0 8" /><path d="M9 6a13 13 0 0 1 0 12" /><path d="M13 4a17 17 0 0 1 0 16" />
+                </svg>
+              </div>
+
+              {/* EMV chip — standard left placement */}
+              <div className="card-chip" style={{ position: "relative", zIndex: 1, marginTop: 10 }} aria-hidden>
+                <span className="card-chip-line" />
+                <span className="card-chip-line" />
+                <span className="card-chip-line" />
               </div>
 
               {/* Mid: avatar + info */}
@@ -133,22 +147,21 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
                 </div>
               </div>
 
-              {/* Footer: expiry + service dots */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, paddingTop: 7, borderTop: "1px solid rgba(255,255,255,0.12)", position: "relative", zIndex: 1 }}>
+              {/* Footer: expiry + status */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: 8, paddingTop: 7, borderTop: "1px solid rgba(255,255,255,0.12)", position: "relative", zIndex: 1 }}>
                 <div>
                   <div style={{ fontSize: 7, opacity: 0.5, textTransform: "uppercase", letterSpacing: 0.5 }}>Valid Until</div>
                   <div style={{ fontSize: 10, fontWeight: 700 }}>{profile.validUntil}</div>
                 </div>
-                {/* Service chips */}
-                <div style={{ display: "flex", gap: 3 }}>
-                  {["NFC", "Mensa", "Lib", "VRR"].map(s => (
-                    <div key={s} style={{
-                      fontSize: 6.5, padding: "2px 4px", borderRadius: 3,
-                      background: profile.isBlocked ? "rgba(255,255,255,0.08)" : "rgba(124,184,37,0.25)",
-                      border: `1px solid ${profile.isBlocked ? "rgba(255,255,255,0.1)" : "rgba(124,184,37,0.4)"}`,
-                      fontWeight: 700, letterSpacing: 0.3, color: profile.isBlocked ? "rgba(255,255,255,0.3)" : "white"
-                    }}>{s}</div>
-                  ))}
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{
+                    width: 6, height: 6, borderRadius: "50%",
+                    background: profile.isBlocked ? "var(--hsrw-red)" : "var(--hsrw-green)",
+                    boxShadow: `0 0 6px ${profile.isBlocked ? "rgba(217,0,34,0.6)" : "rgba(124,184,37,0.6)"}`
+                  }} />
+                  <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", opacity: 0.85 }}>
+                    {profile.isBlocked ? "Blocked" : "Active"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -186,7 +199,7 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
           </div>
         </div>
         <p style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 8 }}>
-          Tap card to flip • Hover to view shine
+          Tap or press Enter to flip the card
         </p>
       </div>
 
@@ -391,7 +404,8 @@ function LibraryTab({ profile, books, onUpdateBooks }: {
                   disabled={b.renewCount >= 3 || profile.isBlocked}
                   style={{
                     border: "1.5px solid var(--border)", background: "transparent",
-                    borderRadius: 8, padding: "6px 12px", fontSize: 12, fontWeight: 600,
+                    borderRadius: 8, padding: "8px 14px", minHeight: 40, fontSize: 12, fontWeight: 600,
+                    fontFamily: "inherit", touchAction: "manipulation",
                     cursor: b.renewCount >= 3 || profile.isBlocked ? "not-allowed" : "pointer",
                     opacity: b.renewCount >= 3 || profile.isBlocked ? 0.4 : 1,
                     color: "var(--hsrw-blue)"
@@ -526,11 +540,11 @@ function MensaTab({ profile, balance, transactions, onUpdateBalance, onAddTransa
         <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "var(--text-muted)" }}>Today's Menu</div>
         <div style={{ display: "flex", background: "var(--bg-card)", border: "1.5px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
           {(["Kleve", "Kamp-Lintfort"] as const).map(c => (
-            <button key={c} onClick={() => setCampus(c)} style={{
-              padding: "5px 10px", fontSize: 11, fontWeight: 600, border: "none",
+            <button key={c} onClick={() => setCampus(c)} aria-pressed={campus === c} style={{
+              padding: "8px 14px", minHeight: 38, fontSize: 11, fontWeight: 600, border: "none",
               background: campus === c ? "var(--hsrw-blue)" : "transparent",
-              color: campus === c ? "white" : "var(--text-muted)", cursor: "pointer",
-              transition: "all 0.15s", fontFamily: "inherit"
+              color: campus === c ? "white" : "var(--text-secondary)", cursor: "pointer",
+              transition: "all 0.15s", fontFamily: "inherit", touchAction: "manipulation"
             }}>{c === "Kamp-Lintfort" ? "Lintfort" : "Kleve"}</button>
           ))}
         </div>
@@ -576,20 +590,29 @@ function MensaTab({ profile, balance, transactions, onUpdateBalance, onAddTransa
                     }}>€{a}</button>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, color: "var(--text-muted)", marginBottom: 10 }}>Payment Method</div>
-                {([["paypal","PayPal"],["card","Credit / Debit Card"],["giropay","giropay / SEPA"]] as const).map(([v, label]) => (
-                  <div key={v} onClick={() => setMethod(v)} style={{
-                    border: `1.5px solid ${method === v ? "var(--hsrw-blue)" : "var(--border)"}`,
-                    borderRadius: 10, padding: "12px 14px", marginBottom: 8,
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    cursor: "pointer", background: method === v ? "#EEF2FB" : "transparent"
-                  }}>
-                    <span style={{ fontWeight: 500, fontSize: 14 }}>{label}</span>
-                    <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === v ? "var(--hsrw-blue)" : "var(--border)"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {method === v && <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--hsrw-blue)" }} />}
-                    </div>
-                  </div>
-                ))}
+                <div id="topup-method-label" style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, color: "var(--text-muted)", marginBottom: 10 }}>Payment Method</div>
+                <div role="radiogroup" aria-labelledby="topup-method-label">
+                  {([["paypal","PayPal"],["card","Credit / Debit Card"],["giropay","giropay / SEPA"]] as const).map(([v, label]) => (
+                    <button
+                      key={v}
+                      type="button"
+                      role="radio"
+                      aria-checked={method === v}
+                      onClick={() => setMethod(v)}
+                      style={{
+                        width: "100%", textAlign: "left", fontFamily: "inherit",
+                        border: `1.5px solid ${method === v ? "var(--hsrw-blue)" : "var(--border)"}`,
+                        borderRadius: 10, padding: "12px 14px", marginBottom: 8, minHeight: 48,
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        cursor: "pointer", background: method === v ? "#EEF2FB" : "transparent"
+                      }}>
+                      <span style={{ fontWeight: 500, fontSize: 14, color: "var(--text-primary)" }}>{label}</span>
+                      <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${method === v ? "var(--hsrw-blue)" : "var(--border)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {method === v && <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--hsrw-blue)" }} />}
+                      </span>
+                    </button>
+                  ))}
+                </div>
                 <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={doTopUp}>Pay €{amount}.00</button>
               </>
             )}
@@ -614,24 +637,26 @@ function WalletTab({ profile, onAddLog, isMobile }: {
   const [nfcTarget,    setNfcTarget]    = useState<"transit" | "mensa" | "library">("transit");
   const [walletAdded,  setWalletAdded]  = useState(false);
   const [qrOpen,       setQrOpen]       = useState(false);
-  const [clock,        setClock]        = useState({ h:"00", m:"00", s:"00", ms:"000" });
+  const [clock,        setClock]        = useState({ h:"00", m:"00", s:"00" });
 
   useEffect(() => {
     if (!qrOpen) return;
-    const id = setInterval(() => {
+    const tick = () => {
       const n = new Date();
       setClock({
         h: String(n.getHours()).padStart(2,"0"),
         m: String(n.getMinutes()).padStart(2,"0"),
         s: String(n.getSeconds()).padStart(2,"0"),
-        ms: String(n.getMilliseconds()).padStart(3,"0"),
       });
-    }, 50);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, [qrOpen]);
 
   const startNfc = () => {
-    if (profile.isBlocked) { alert("Card is blocked!"); return; }
+    // Defensive: the trigger button is already disabled while blocked.
+    if (profile.isBlocked) return;
     setNfcState("scanning");
     onAddLog("INFO", `NFC broadcast → ${nfcTarget} terminal`);
     setTimeout(() => {
@@ -653,15 +678,17 @@ function WalletTab({ profile, onAddLog, isMobile }: {
             </p>
 
         {/* NFC Target selector — mobile only, NFC physically requires a phone */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
+        <div role="radiogroup" aria-label="NFC target terminal" style={{ display: "flex", gap: 6, marginBottom: 20 }}>
           {(["transit","mensa","library"] as const).map(t => (
-            <button key={t} id={`btn-nfc-${t}`} onClick={() => setNfcTarget(t)} style={{
-              flex: 1, padding: "9px 4px", borderRadius: 8, fontFamily: "inherit",
+            <button key={t} id={`btn-nfc-${t}`} onClick={() => setNfcTarget(t)}
+              role="radio" aria-checked={nfcTarget === t} aria-label={`NFC target: ${t}`}
+              style={{
+              flex: 1, padding: "9px 4px", minHeight: 44, borderRadius: 8, fontFamily: "inherit",
               border: `2px solid ${nfcTarget === t ? "var(--hsrw-blue)" : "#C0C5D0"}`,
               background: nfcTarget === t ? "var(--hsrw-blue)" : "#EBEDF3",
               color: nfcTarget === t ? "#FFFFFF" : "#3A3D48",
               fontWeight: 700, fontSize: 12, cursor: "pointer", textTransform: "capitalize",
-              transition: "all 0.15s", letterSpacing: 0.2
+              transition: "all 0.15s", letterSpacing: 0.2, touchAction: "manipulation"
             }}>{t}</button>
           ))}
         </div>
@@ -830,7 +857,6 @@ function WalletTab({ profile, onAddLog, isMobile }: {
             </p>
 
             <div className="qr-ticket-bg">
-              <div className="qr-sweep" />
               <svg viewBox="0 0 100 100" fill="#1A171B" style={{ width: "100%", maxWidth: 220, display: "block", margin: "0 auto" }}>
                 {/* Corner markers */}
                 <rect x="0" y="0" width="30" height="30"/>
@@ -861,20 +887,21 @@ function WalletTab({ profile, onAddLog, isMobile }: {
                 <rect x="85" y="85" width="15" height="15"/>
               </svg>
 
-              {/* HSRW green accent line at bottom of QR area */}
-              <div style={{ height: 3, background: "linear-gradient(90deg, var(--hsrw-green), var(--hsrw-teal))", borderRadius: 2, marginTop: 12 }} />
             </div>
 
-            {/* Live millisecond clock */}
+            {/* Live validation clock */}
             <div style={{
-              background: "var(--hsrw-navy)", borderRadius: 12, padding: "10px 16px",
-              marginTop: 14, display: "flex", justifyContent: "center", alignItems: "baseline",
-              gap: 4, fontFamily: "ui-monospace,'SF Mono',monospace"
+              background: "var(--hsrw-navy)", borderRadius: 12, padding: "12px 16px",
+              marginTop: 16, display: "flex", justifyContent: "center", alignItems: "center",
+              gap: 10, fontFamily: "ui-monospace,'SF Mono',monospace"
             }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 600, color: "var(--hsrw-green)", letterSpacing: 0.5, textTransform: "uppercase", fontFamily: "var(--font-sans)" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--hsrw-green)" }} />
+                Live
+              </span>
               <span style={{ fontSize: 22, fontWeight: 700, color: "white", letterSpacing: 2 }}>
                 {clock.h}:{clock.m}:{clock.s}
               </span>
-              <span style={{ fontSize: 13, color: "var(--hsrw-green)", fontWeight: 700 }}>.{clock.ms}</span>
             </div>
 
             <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6 }}>
@@ -1045,6 +1072,7 @@ export default function Home() {
 
       {/* ── Content ── */}
       <main className="app-content">
+        <h1 className="sr-only">{tabTitle[tab]} — HSRW UniCard</h1>
         {tab === "card"    && <PersonalTab profile={profile} onBlock={handleBlock} onReportLost={handleReportLost} />}
         {tab === "library" && <LibraryTab  profile={profile} books={books} onUpdateBooks={setBooks} />}
         {tab === "mensa"   && <MensaTab    profile={profile} balance={balance} transactions={transactions} onUpdateBalance={setBalance} onAddTransaction={tx => setTransactions(p => [tx, ...p])} />}

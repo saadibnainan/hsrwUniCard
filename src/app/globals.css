@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+/* Inter is loaded via next/font in layout.tsx (exposes --font-sans).
+   No CSS @import — avoids double-loading the font. */
 
 /* ============================================================
    HSRW UniCard — Official Brand Theme
@@ -27,7 +28,8 @@
   --bg-input:        #FFFFFF;
   --text-primary:    #1A171B;
   --text-secondary:  #4A4D55;
-  --text-muted:      #87888A;
+  --text-muted:      #6B6D76;   /* darkened from #87888A → ~5.2:1 on white (WCAG AA) */
+  --text-faint:      #87888A;   /* old muted value — decorative only, never body text */
   --border:          #DDDFE6;
   --border-focus:    var(--hsrw-blue);
   --shadow-sm:       0 1px 3px rgba(40,37,90,0.08), 0 1px 2px rgba(40,37,90,0.04);
@@ -64,12 +66,37 @@ body {
   height: 100%;
   background: var(--bg-app);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
+}
+
+/* ── Keyboard focus: visible ring on every interactive element ──
+   Mouse/touch users see nothing (focus-visible); keyboard users get a clear ring. */
+:focus-visible {
+  outline: 2px solid var(--hsrw-blue);
+  outline-offset: 2px;
+}
+/* On the dark navy sidebar/top-bar, a white ring reads better than navy-on-navy */
+.top-bar :focus-visible,
+.bottom-nav :focus-visible {
+  outline-color: #FFFFFF;
+}
+
+/* ── Respect reduced-motion: kill non-essential animation/transition ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  .id-card-scene.flipped .id-card-inner { transition: none; }
+  .nfc-pulse, .spin { animation: none !important; }
 }
 
 /* ============================================================
@@ -129,6 +156,14 @@ body {
     height: 100svh;
     padding-bottom: 0;   /* no bottom nav on desktop */
     overflow-y: auto;
+  }
+
+  /* Constrain content width on wide screens so cards don't stretch edge-to-edge
+     and line length stays readable (≈760px reading column, centered). */
+  .app-content > * {
+    max-width: 760px;
+    margin-inline: auto;
+    padding-top: 8px;
   }
 
   /* Bottom nav hidden on desktop — replaced by sidebar */
@@ -354,6 +389,7 @@ body {
   background: var(--bg-card);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
+  border: 1px solid rgba(40,37,90,0.05);
   overflow: hidden;
 }
 
@@ -445,31 +481,54 @@ body {
 .id-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 14px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 14px 16px;
+  padding: 16px 18px;
   box-shadow: 0 8px 24px rgba(40,37,90,0.2), 0 1px 4px rgba(40,37,90,0.1);
+  /* Safety net: some engines (Safari) ignore backface-visibility inside a
+     preserve-3d flip and bleed the mirrored opposite face through. We fade
+     each face across a short window centered on the 90° midpoint (0.35s = half
+     of the 0.7s flip) so the swap is a soft crossfade, not a hard pop. */
+  transition: opacity 0.18s ease 0.26s;
 }
 
+.id-card-back  { opacity: 0; }
+.id-card-scene.flipped .id-card-front { opacity: 0; }
+.id-card-scene.flipped .id-card-back  { opacity: 1; }
+
 .id-card-front {
-  background: linear-gradient(140deg, var(--hsrw-navy) 0%, #1D4A8A 55%, var(--hsrw-blue) 100%);
+  background:
+    linear-gradient(140deg, rgba(40,37,90,0.82) 0%, rgba(29,74,138,0.78) 55%, rgba(45,108,194,0.72) 100%),
+    radial-gradient(120% 90% at 85% 15%, rgba(124,184,37,0.28) 0%, transparent 45%),
+    radial-gradient(110% 80% at 10% 90%, rgba(45,108,194,0.35) 0%, transparent 50%),
+    var(--hsrw-navy);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);   /* frosted glass surface */
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.30),     /* top glass highlight */
+    inset 0 -1px 2px rgba(0,0,0,0.18),
+    0 8px 24px rgba(40,37,90,0.30),
+    0 1px 4px rgba(40,37,90,0.15);
   color: white;
 }
 
-/* subtle texture overlay */
+/* diagonal glass sheen + subtle texture overlay */
 .id-card-front::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent 0px, transparent 28px,
-    rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px
-  );
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 16%, transparent 38%),
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px, transparent 28px,
+      rgba(255,255,255,0.012) 28px, rgba(255,255,255,0.012) 29px
+    );
   pointer-events: none;
 }
 
@@ -486,6 +545,40 @@ body {
   background: linear-gradient(140deg, #1A1740 0%, var(--hsrw-navy) 100%);
   color: white;
   transform: rotateY(180deg);
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.20), 0 8px 24px rgba(40,37,90,0.30);
+}
+
+/* EMV chip — gold contact pad, standard left placement */
+.card-chip {
+  width: 38px;
+  height: 29px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #fbe48a 0%, #e8c45a 35%, #c8962e 70%, #b8860b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 2px rgba(0,0,0,0.30),
+    0 1px 3px rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 5px;
+  position: relative;
+}
+/* vertical contact line — crosses the 3 horizontals into a chip grid */
+.card-chip::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 22%; bottom: 22%;
+  width: 1px;
+  background: rgba(120,80,10,0.50);
+  transform: translateX(-0.5px);
+}
+.card-chip-line {
+  height: 1px;
+  background: rgba(120,80,10,0.45);
+  border-radius: 1px;
 }
 
 /* blocked overlay */
@@ -573,7 +666,7 @@ body {
   border-radius: var(--radius-sm);
   background: var(--bg-input);
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: 16px;            /* ≥16px stops iOS Safari auto-zoom on focus */
   font-family: inherit;
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -603,6 +696,8 @@ body {
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;   /* removes 300ms tap delay on mobile */
+  min-height: 44px;             /* WCAG/HIG touch target */
 }
 
 .btn:active { transform: scale(0.98); opacity: 0.88; }
@@ -641,7 +736,9 @@ body {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(26,23,27,0.55);
+  background: rgba(26,23,27,0.45);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);   /* frosted glass behind the sheet */
   z-index: 100;
   display: flex;
   align-items: flex-end;
@@ -658,6 +755,7 @@ body {
   max-height: 90svh;
   overflow-y: auto;
   animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -8px 40px rgba(26,23,27,0.18);
 }
 
 .sheet-handle {
@@ -684,6 +782,21 @@ body {
 
 @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes popIn   { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* Desktop: bottom-sheets become centered dialogs (a sheet stuck to the
+   bottom of a 1440px window looks broken). */
+@media (min-width: 768px) {
+  .overlay { align-items: center; }
+  .sheet {
+    max-width: 420px;
+    border-radius: var(--radius-lg);
+    padding-bottom: 28px;
+    max-height: 88svh;
+    animation: popIn 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .sheet-handle { display: none; }  /* no swipe affordance with a mouse */
+}
 
 /* ============================================================
    NFC ANIMATION
@@ -732,27 +845,11 @@ body {
    ============================================================ */
 .qr-ticket-bg {
   background: white;
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-/* The HSRW green scanning sweep line */
-.qr-sweep {
-  position: absolute;
-  left: 20px; right: 20px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--hsrw-green) 25%, var(--hsrw-green) 75%, transparent);
-  box-shadow: 0 0 10px rgba(124,184,37,0.6);
-  animation: qrSweep 2.4s ease-in-out infinite;
-}
-
-@keyframes qrSweep {
-  0%   { top: 20px; }
-  50%  { top: calc(100% - 24px); }
-  100% { top: 20px; }
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
 }
 
 /* ============================================================
@@ -808,6 +905,17 @@ body {
 .text-muted  { color: var(--text-muted); }
 .gap-stack   { display: flex; flex-direction: column; gap: 10px; }
 .px { padding-left: 16px; padding-right: 16px; }
+
+/* Visually hidden but available to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ============================================================
    DESKTOP OVERRIDES (Must be at the very end to win specificity)

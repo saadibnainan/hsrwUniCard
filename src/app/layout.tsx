@@ -34,8 +34,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Zoom intentionally left enabled (no maximumScale / userScalable:false) —
+  // disabling pinch-zoom is a WCAG 1.4.4 failure.
   viewportFit: "cover",
   themeColor: "#28255A",
 };

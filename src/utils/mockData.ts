@@ -40,8 +40,8 @@ export interface AuditLog {
 
 // Initial Data
 export const INITIAL_PROFILE: StudentProfile = {
-  name: "Mushfiqur Rahman",
-  email: "mohammad-mushfiqur-rahman.joy@hsrw.org",
+  name: "Mushfiqur Joy",
+  email: "mushfiqur.joy@hsrw.org",
   studentId: "32363",
   birthDate: "04.12.2001",
   degreeProgram: "B.Sc in Mobility & Logistics",
