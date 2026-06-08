@@ -44,6 +44,7 @@
 
   /* ── Layout ── */
   --nav-height:      64px;
+  --nav-side-gap:    14px;  /* side margins that give the bar its floating-pill look — no bottom margin, so its edge stays flush with the screen and leaves no gap */
   --top-bar-height:  58px;
   --radius-xs:       6px;
   --radius-sm:       10px;
@@ -329,21 +330,21 @@ body {
   background: var(--bg-app);
 }
 
-/* ── Bottom Nav — docked liquid-glass bar ──
+/* ── Bottom Nav — floating liquid-glass pill, flush to the edge ──
    Detached from .app-shell and pinned straight to the device viewport
    (not the shell's box, which iOS sizes unreliably on first standalone
    launch and mid-scroll — that's what caused the original gap under the
-   bar). Sits flush against the bottom edge — no gap, no margin — with the
-   safe-area inset baked into its own height/padding so the glass surface
-   itself covers the home-indicator zone (iOS-26 "Liquid Glass" tab-bar
-   style: content scrolls underneath and shows through the frosted glass,
-   the bar's surface runs edge-to-edge with no void beneath it). */
+   bar). Floats horizontally (margins on the sides keep the pill look) but
+   has NO bottom margin — its bottom edge sits flush against the screen
+   edge, and its own height bakes in the safe-area inset so the glass
+   surface fills the home-indicator zone itself rather than leaving an
+   empty strip beneath it. Floating look, zero gap underneath. */
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 430px;
+  left: var(--nav-side-gap);
+  right: var(--nav-side-gap);
+  max-width: calc(430px - 2 * var(--nav-side-gap));
   margin-inline: auto;
   height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
