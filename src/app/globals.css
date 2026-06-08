@@ -43,7 +43,8 @@
   --color-info:      var(--hsrw-blue);
 
   /* ── Layout ── */
-  --nav-height:      68px;
+  --nav-height:      64px;
+  --nav-float-gap:   14px;  /* margin between the floating nav pill and the screen edges */
   --top-bar-height:  58px;
   --radius-xs:       6px;
   --radius-sm:       10px;
@@ -135,10 +136,17 @@ body {
     overflow: hidden;
   }
 
-  /* Top bar becomes the sidebar — full viewport height, flex column */
+  /* Top bar becomes the sidebar — full viewport height, flex column.
+     Solid navy here (not the mobile glass treatment): a full-height sidebar
+     has no scrolling content behind it for the blur to pick up, so the
+     translucent version would just look flat and washed out. */
   .top-bar {
     width: 240px;
     height: 100%;            /* fill the full-height shell */
+    background: var(--hsrw-navy);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: none;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
@@ -257,7 +265,12 @@ body {
 /* ── Top Bar (mobile default) ── */
 .top-bar {
   /* No fixed height here — height controlled per breakpoint below */
-  background: var(--hsrw-navy);
+  /* Frosted navy glass — translucent + blurred/saturated, matching the
+     floating nav pill so both pieces of "chrome" read as one design language. */
+  background: rgba(40, 37, 90, 0.78);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -301,38 +314,46 @@ body {
   font-weight: 400;
 }
 
-/* ── Scroll Area ── */
+/* ── Scroll Area ──
+   Content runs the full height of the shell — including behind the top bar's
+   bottom edge and underneath the floating glass nav pill — so it's visible
+   (frosted) through both as the user scrolls, iOS-26 "Liquid Glass" style.
+   The bottom padding just keeps the LAST item scrollable clear of the pill. */
 .app-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 8px);
+  padding-bottom: calc(var(--nav-height) + var(--nav-float-gap) + env(safe-area-inset-bottom, 0px) + 16px);
   background: var(--bg-app);
 }
 
-/* ── Bottom Nav ──
-   Pinned straight to the device viewport (not nested inside .app-shell).
-   iOS sizes the shell unreliably on first paint after a Home-Screen launch
-   and during scroll/chrome transitions, which left the nav floating above
-   the real screen edge with a blank strip below it. `position: fixed`
-   anchored to the viewport's own edges sidesteps the shell entirely — the
-   nav always sits flush against the true bottom of the screen. */
+/* ── Bottom Nav — floating liquid-glass pill ──
+   Detached from .app-shell and pinned straight to the device viewport
+   (not the shell's box, which iOS sizes unreliably on first standalone
+   launch and mid-scroll — that's what caused the gap under the old docked
+   bar). Floats above the content with margin on every side, like iOS 26's
+   redesigned tab bar / Telegram's rounded bar — content scrolls underneath
+   and shows through the frosted glass. */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width: 430px;
+  bottom: calc(var(--nav-float-gap) + env(safe-area-inset-bottom, 0px));
+  left: var(--nav-float-gap);
+  right: var(--nav-float-gap);
+  max-width: calc(430px - 2 * var(--nav-float-gap));
   margin-inline: auto;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
+  height: var(--nav-height);
+  padding: 6px;
+  gap: 2px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.62);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 14px 38px rgba(26,23,27,0.16), inset 0 1px 0 rgba(255,255,255,0.55);
   display: flex;
   align-items: stretch;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   z-index: 20;
-  flex-shrink: 0;
 }
 
 .nav-tab {
@@ -341,39 +362,37 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   border: none;
   background: transparent;
+  border-radius: 9999px;
   color: var(--text-muted);
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 9.5px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 8px 4px 4px;
   position: relative;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, opacity 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.nav-tab:active { background: rgba(46,87,165,0.04); }
+.nav-tab:active { opacity: 0.6; }
 
 .nav-tab.active { color: var(--hsrw-blue); }
 
-/* Liquid-glass highlight: a frosted pill morphs in behind the active tab.
-   Painted via ::before (first in DOM order) so the icon/label stay on top
-   without needing z-index juggling in the flex layout. */
+/* Active highlight: a flat tinted pill that scales/fades in behind the icon.
+   Deliberately NOT another blurred glass layer — nesting backdrop-filter
+   inside an already-blurred bar is what made the icon disappear before
+   (overlapping blur layers compose unpredictably on iOS). A solid tint
+   paints cleanly behind the icon/label in normal DOM order, every time. */
 .nav-tab::before {
   content: "";
   position: absolute;
-  inset: 6px 14px;
-  border-radius: var(--radius-md);
-  background: rgba(46,87,165,0.10);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  backdrop-filter: blur(14px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: 0 4px 16px rgba(46,87,165,0.14), inset 0 1px 0 rgba(255,255,255,0.6);
+  inset: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(46,87,165,0.13);
   opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: scale(0.7);
+  transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-tab.active::before {
@@ -382,25 +401,15 @@ body {
 }
 
 .nav-tab svg {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
   stroke-width: 1.8;
+  position: relative;
 }
 
-.nav-tab-indicator {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 2.5px;
-  background: var(--hsrw-blue);
-  border-radius: 0 0 3px 3px;
-  opacity: 0;
-  transition: opacity 0.15s ease;
+.nav-tab span {
+  position: relative;
 }
-
-.nav-tab.active .nav-tab-indicator { opacity: 1; }
 
 /* ============================================================
    SECTION HEADERS
@@ -788,7 +797,15 @@ body {
 .sheet {
   width: 100%;
   max-width: 430px;
-  background: var(--bg-card);
+  /* Frosted glass surface — translucent over the blurred .overlay backdrop,
+     same family as the top bar / nav pill. Opacity stays high (0.88) so
+     body text keeps its contrast; the glass character shows at the edges
+     and through the blur rather than by thinning the surface itself. */
+  background: rgba(255,255,255,0.88);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-bottom: none;
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   padding: 0 16px 40px;
   max-height: 90svh;
