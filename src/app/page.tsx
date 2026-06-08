@@ -6,6 +6,7 @@ import {
   StudentProfile, LibraryBook, Transaction, AuditLog, CANTEEN_MENUS
 } from "@/utils/mockData";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useViewportHeight } from "@/hooks/useViewportHeight";
 import LoginView from "@/components/LoginView";
 
 /* ─────────────────────────────────────────────────────────────
@@ -961,6 +962,7 @@ export default function Home() {
   const [logs,         setLogs]         = useState<AuditLog[]>([]);
   // Must be called unconditionally, before any early returns (Rules of Hooks)
   const isMobile = useIsMobile();
+  useViewportHeight();
 
   const log = useCallback((type: LogType, message: string) => {
     setLogs(prev => [...prev, { timestamp: new Date().toISOString(), type, message }]);
