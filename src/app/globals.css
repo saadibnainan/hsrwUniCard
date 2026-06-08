@@ -311,12 +311,20 @@ body {
   background: var(--bg-app);
 }
 
-/* ── Bottom Nav ── */
+/* ── Bottom Nav ──
+   Pinned straight to the device viewport (not nested inside .app-shell).
+   iOS sizes the shell unreliably on first paint after a Home-Screen launch
+   and during scroll/chrome transitions, which left the nav floating above
+   the real screen edge with a blank strip below it. `position: fixed`
+   anchored to the viewport's own edges sidesteps the shell entirely — the
+   nav always sits flush against the true bottom of the screen. */
 .bottom-nav {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 430px;
+  margin-inline: auto;
   height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
   background: var(--bg-card);
   border-top: 1px solid var(--border);
@@ -349,6 +357,29 @@ body {
 .nav-tab:active { background: rgba(46,87,165,0.04); }
 
 .nav-tab.active { color: var(--hsrw-blue); }
+
+/* Liquid-glass highlight: a frosted pill morphs in behind the active tab.
+   Painted via ::before (first in DOM order) so the icon/label stay on top
+   without needing z-index juggling in the flex layout. */
+.nav-tab::before {
+  content: "";
+  position: absolute;
+  inset: 6px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(46,87,165,0.10);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 4px 16px rgba(46,87,165,0.14), inset 0 1px 0 rgba(255,255,255,0.6);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-tab.active::before {
+  opacity: 1;
+  transform: scale(1);
+}
 
 .nav-tab svg {
   width: 22px;
