@@ -105,11 +105,18 @@ body {
 .app-shell {
   display: flex;
   flex-direction: column;
-  height: var(--app-height, 100dvh);
+  /* Pin to the device screen instead of relying on a viewport height unit.
+     iOS Safari miscomputes svh/dvh on the FIRST paint after a Home-Screen
+     (standalone) launch, sizing the shell short and leaving a blank strip
+     under the bottom nav until a reload. `position: fixed; inset: 0` is
+     resolved against the viewport synchronously at first paint, so the shell
+     always fills the real screen — no JS, no timing race, no keyboard jank. */
+  position: fixed;
+  inset: 0;
+  width: 100%;
   max-width: 430px;
-  margin: 0 auto;
+  margin-inline: auto;
   background: var(--bg-app);
-  position: relative;
   overflow: hidden;
 }
 
@@ -121,9 +128,9 @@ body {
   body { background: var(--bg-app); overflow: hidden; }
 
   .app-shell {
-    /* Reset mobile-only constraints */
+    /* Reset mobile-only constraints. Still pinned via `position: fixed; inset: 0`
+       (inherited from the base rule), so it fills the full viewport height. */
     max-width: 100%;
-    height: var(--app-height, 100dvh);
     flex-direction: row;  /* sidebar | content side-by-side */
     overflow: hidden;
   }
@@ -131,7 +138,7 @@ body {
   /* Top bar becomes the sidebar — full viewport height, flex column */
   .top-bar {
     width: 240px;
-    height: var(--app-height, 100dvh); /* fill the full viewport height */
+    height: 100%;            /* fill the full-height shell */
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
@@ -153,7 +160,7 @@ body {
   /* Content area takes remaining space */
   .app-content {
     flex: 1;
-    height: var(--app-height, 100dvh);
+    height: 100%;
     padding-bottom: 0;   /* no bottom nav on desktop */
     overflow-y: auto;
   }
@@ -866,7 +873,7 @@ body {
    LOGIN PAGE
    ============================================================ */
 .login-page {
-  min-height: var(--app-height, 100dvh);
+  min-height: 100dvh;
   background: var(--bg-app);
   display: flex;
   flex-direction: column;
