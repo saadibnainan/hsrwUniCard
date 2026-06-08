@@ -357,12 +357,20 @@ body {
   border-bottom: none;
   box-shadow: 0 -8px 28px rgba(26,23,27,0.1), inset 0 1px 0 rgba(255,255,255,0.55);
   display: flex;
-  align-items: stretch;
+  /* `center` not `stretch` — tabs must be centered in the visible capsule
+     zone (--nav-height) only; stretching them into the safe-area padding
+     below shifts the icon/label centroid downward and misaligns active vs
+     inactive tabs. */
+  align-items: center;
   z-index: 20;
 }
 
 .nav-tab {
   flex: 1;
+  /* Fixed to the visible capsule height so the tab's centroid never varies
+     with the safe-area size — active and inactive tabs are always on the
+     same grid. */
+  height: var(--nav-height);
   display: flex;
   flex-direction: column;
   align-items: center;
