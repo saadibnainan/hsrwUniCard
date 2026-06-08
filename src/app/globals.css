@@ -324,7 +324,11 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(var(--nav-height) + var(--nav-float-gap) + env(safe-area-inset-bottom, 0px) + 16px);
+  /* `max()`, not `+` — on devices with a home-indicator safe area, that inset
+     IS the bottom clearance; stacking the float-gap on top of it doubled the
+     space below the pill into a visible empty band. Devices without a safe
+     area (older iPhones, Android, desktop) fall back to the float-gap. */
+  padding-bottom: calc(var(--nav-height) + max(var(--nav-float-gap), env(safe-area-inset-bottom, 0px)) + 16px);
   background: var(--bg-app);
 }
 
@@ -337,7 +341,11 @@ body {
    and shows through the frosted glass. */
 .bottom-nav {
   position: fixed;
-  bottom: calc(var(--nav-float-gap) + env(safe-area-inset-bottom, 0px));
+  /* Same `max()` reasoning as .app-content's padding: the safe-area inset
+     already clears the home indicator, so don't stack the float-gap on top
+     of it — that left a visible empty band between the pill and the screen
+     edge ("gaping underneath"). Use whichever clearance is larger. */
+  bottom: max(var(--nav-float-gap), env(safe-area-inset-bottom, 0px));
   left: var(--nav-float-gap);
   right: var(--nav-float-gap);
   max-width: calc(430px - 2 * var(--nav-float-gap));
