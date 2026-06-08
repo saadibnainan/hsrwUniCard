@@ -43,7 +43,7 @@
   --color-info:      var(--hsrw-blue);
 
   /* ── Layout ── */
-  --nav-height:      64px;
+  --nav-height:      52px;
   --nav-side-gap:    14px;  /* side margins that give the bar its floating-pill look — no bottom margin, so its edge stays flush with the screen and leaves no gap */
   --top-bar-height:  58px;
   --radius-xs:       6px;
@@ -347,8 +347,8 @@ body {
   max-width: calc(430px - 2 * var(--nav-side-gap));
   margin-inline: auto;
   height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
-  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
-  gap: 2px;
+  padding: 5px 5px calc(5px + env(safe-area-inset-bottom, 0px));
+  gap: 0;
   border-radius: 9999px;
   background: rgba(255,255,255,0.62);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
@@ -367,12 +367,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   border: none;
   background: transparent;
   border-radius: 9999px;
   color: var(--text-muted);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 600;
   cursor: pointer;
   position: relative;
@@ -406,8 +406,8 @@ body {
 }
 
 .nav-tab svg {
-  width: 21px;
-  height: 21px;
+  width: 19px;
+  height: 19px;
   stroke-width: 1.8;
   position: relative;
 }
