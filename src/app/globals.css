@@ -44,7 +44,8 @@
 
   /* ── Layout ── */
   --nav-height:      52px;
-  --nav-side-gap:    14px;  /* side margins that give the bar its floating-pill look — no bottom margin, so its edge stays flush with the screen and leaves no gap */
+  --nav-side-gap:    14px;  /* side margins that give the capsule its floating look */
+  --nav-bottom-gap:  6px;   /* breath between the capsule and the home indicator (or screen edge) — content scrolls through it, so it never reads as dead space */
   --top-bar-height:  58px;
   --radius-xs:       6px;
   --radius-sm:       10px;
@@ -316,61 +317,51 @@ body {
 
 /* ── Scroll Area ──
    Content runs the full height of the shell — including behind the top bar's
-   bottom edge and underneath the glass nav bar — so it's visible (frosted)
-   through both as the user scrolls, iOS-26 "Liquid Glass" style. The bottom
-   padding just keeps the LAST item scrollable clear of the bar. */
+   bottom edge and underneath the glass nav pill, all the way to the screen's
+   bottom edge — so it's visible (frosted) through both as the user scrolls,
+   iOS-26 "Liquid Glass" style. The bottom padding just keeps the LAST item
+   scrollable clear of the floating pill. */
 .app-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  /* The bar's own height already bakes in the safe-area inset (see .bottom-nav),
-     so clearing it is just nav-height + inset + a little breathing room. */
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+  padding-bottom: calc(var(--nav-height) + var(--nav-bottom-gap) + env(safe-area-inset-bottom, 0px) + 12px);
   background: var(--bg-app);
 }
 
-/* ── Bottom Nav — floating liquid-glass pill, flush to the edge ──
+/* ── Bottom Nav — floating liquid-glass capsule ──
    Detached from .app-shell and pinned straight to the device viewport
    (not the shell's box, which iOS sizes unreliably on first standalone
    launch and mid-scroll — that's what caused the original gap under the
-   bar). Floats horizontally (margins on the sides keep the pill look) but
-   has NO bottom margin — its bottom edge sits flush against the screen
-   edge, and its own height bakes in the safe-area inset so the glass
-   surface fills the home-indicator zone itself rather than leaving an
-   empty strip beneath it. Floating look, zero gap underneath. */
+   bar). A slim fixed-height capsule that floats just above the home
+   indicator (GitHub-iOS / iOS-26 tab bar style): content scrolls beneath
+   it to the very bottom edge of the screen, so the strip under the pill
+   shows live content — never a dead white block. On devices without a
+   safe-area inset it sits a small breath off the edge. */
 .bottom-nav {
   position: fixed;
-  bottom: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--nav-bottom-gap));
   left: var(--nav-side-gap);
   right: var(--nav-side-gap);
   max-width: calc(430px - 2 * var(--nav-side-gap));
   margin-inline: auto;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
-  padding: 5px 5px calc(5px + env(safe-area-inset-bottom, 0px));
+  height: var(--nav-height);
+  padding: 5px;
   gap: 0;
   border-radius: 9999px;
   background: rgba(255,255,255,0.62);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
   backdrop-filter: blur(28px) saturate(190%);
   border: 1px solid rgba(255,255,255,0.7);
-  border-bottom: none;
-  box-shadow: 0 -8px 28px rgba(26,23,27,0.1), inset 0 1px 0 rgba(255,255,255,0.55);
+  box-shadow: 0 10px 30px rgba(26,23,27,0.14), inset 0 1px 0 rgba(255,255,255,0.55);
   display: flex;
-  /* `center` not `stretch` — tabs must be centered in the visible capsule
-     zone (--nav-height) only; stretching them into the safe-area padding
-     below shifts the icon/label centroid downward and misaligns active vs
-     inactive tabs. */
-  align-items: center;
+  align-items: stretch;
   z-index: 20;
 }
 
 .nav-tab {
   flex: 1;
-  /* Fixed to the visible capsule height so the tab's centroid never varies
-     with the safe-area size — active and inactive tabs are always on the
-     same grid. */
-  height: var(--nav-height);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -944,13 +935,24 @@ body {
    LOGIN PAGE
    ============================================================ */
 .login-page {
-  min-height: 100dvh;
+  /* Same trick as .app-shell: pin to the viewport instead of trusting
+     100dvh, which iOS miscomputes on the first standalone paint and leaves
+     a blank strip at the bottom of the login screen (and behind the
+     biometric blur overlay). Fixed + inset:0 always fills the real screen,
+     edge to edge, home-indicator zone included. */
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-app);
   display: flex;
   flex-direction: column;
 }
 
 .login-header {
+  /* Anchors the green accent strip (position:absolute; bottom:0 in JSX) —
+     without this it escaped to the bottom of the page. */
+  position: relative;
   background: var(--hsrw-navy);
   padding: calc(48px + env(safe-area-inset-top, 0px)) 24px 36px;
   display: flex;
@@ -967,7 +969,8 @@ body {
 
 .login-body {
   flex: 1;
-  padding: 28px 20px 40px;
+  /* keep the last control clear of the home indicator */
+  padding: 28px 20px calc(40px + env(safe-area-inset-bottom, 0px));
   max-width: 430px;
   margin: 0 auto;
   width: 100%;
