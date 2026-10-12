@@ -115,7 +115,9 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
                 id="login-password"
                 className="input"
                 type={showPw ? "text" : "password"}
-                placeholder="••••••••"
+                /* Bullets here looked like a pre-filled password, so people
+                   pressed Sign In and hit the length error. State the rule. */
+                placeholder="At least 4 characters"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(""); }}
                 autoComplete="current-password"
