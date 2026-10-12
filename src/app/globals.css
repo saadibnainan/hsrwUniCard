@@ -511,6 +511,11 @@ body {
    ============================================================ */
 .id-card-scene {
   width: 100%;
+  /* The card's type is fixed-size (7-15px), laid out for a phone-width card.
+     Uncapped, the desktop column (760px) blew it up to ~730x460 with tiny
+     text marooned in the corners. Hold it at a real card's on-screen size. */
+  max-width: 420px;
+  margin-inline: auto;
   aspect-ratio: 85.6 / 54;     /* ISO 7810 ID-1 ratio */
   perspective: 900px;
   cursor: pointer;
