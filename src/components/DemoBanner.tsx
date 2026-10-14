@@ -3,7 +3,7 @@
 export default function DemoBanner() {
   return (
     <div className="demo-banner" role="note" aria-label="Unofficial demo notice">
-      <strong>Unofficial demo.</strong> Not affiliated with HSRW. Don&apos;t use your real password.
+      <strong>Unofficial demo</strong> · not affiliated with HSRW
     </div>
   );
 }
