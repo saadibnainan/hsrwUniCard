@@ -164,7 +164,7 @@ export default function WalletPass({ profile, onAddLog }: WalletPassProps) {
             {/* Micro Wallet Pass Mockup */}
             <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 mt-6 flex flex-col gap-2">
               <div className="flex justify-between items-center text-[10px] text-cyan-400 font-mono">
-                <span>HOCHSCHULE RHEIN-WAAL</span>
+                <span>UNICARD DEMO</span>
                 <span>STUDENT ID</span>
               </div>
               <div className="text-sm font-bold text-slate-200">{profile.name}</div>

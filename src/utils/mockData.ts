@@ -42,7 +42,7 @@ export interface AuditLog {
 export const INITIAL_PROFILE: StudentProfile = {
   // Fictional demo student (German standard placeholder name).
   name: "Max Mustermann",
-  email: "max.mustermann@hsrw.org",
+  email: "max.mustermann@example.com",
   studentId: "12345",
   birthDate: "01.01.2000",
   degreeProgram: "B.Sc in Mobility & Logistics",

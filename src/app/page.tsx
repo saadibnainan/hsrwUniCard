@@ -7,23 +7,7 @@ import {
 } from "@/utils/mockData";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import LoginView from "@/components/LoginView";
-
-/* ─────────────────────────────────────────────────────────────
-   HSRW Y-Logo inline SVG
-───────────────────────────────────────────────────────────── */
-// Logo renders white on dark backgrounds (nav bar / login header)
-function HSRWMark({ size = 28, variant = "dark" }: { size?: number; variant?: "dark" | "light" }) {
-  // On dark bg (variant="dark"): both arms are bright white/near-white
-  // On light bg (variant="light"): use the brand navy/blue colors
-  const arm1 = variant === "dark" ? "#FFFFFF" : "#3374B5";
-  const arm2 = variant === "dark" ? "rgba(255,255,255,0.55)" : "#28255A";
-  return (
-    <svg width={size} height={size} viewBox="0 0 60 60" fill="none">
-      <path d="M12 6 L30 30 L30 54" stroke={arm1} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M48 6 L30 30" stroke={arm2} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
+import UniCardMark from "@/components/UniCardMark";
 
 /* ─────────────────────────────────────────────────────────────
    DEVICE DETECTION
@@ -101,9 +85,9 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
               {/* Top row: logo + contactless */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 1 }}>
                 <div>
-                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9, lineHeight: 1 }}>Hochschule</div>
-                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9 }}>Rhein-Waal</div>
-                  <div style={{ fontSize: 7, opacity: 0.5, marginTop: 1 }}>Rhine-Waal University of Applied Sciences</div>
+                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9, lineHeight: 1 }}>UniCard</div>
+                  <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.2, textTransform: "uppercase", opacity: 0.9 }}>Demo</div>
+                  <div style={{ fontSize: 7, opacity: 0.5, marginTop: 1 }}>Campus card concept, not a valid ID</div>
                 </div>
                 {/* Contactless symbol */}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
@@ -169,7 +153,7 @@ function PersonalTab({ profile, onBlock, onReportLost }: {
             {/* Back */}
             <div className="id-card-face id-card-back">
               <div style={{ fontSize: 7.5, opacity: 0.45, letterSpacing: 0.8, textTransform: "uppercase" }}>
-                RFID Dual-Interface — Not Transferable — Hochschule Rhein-Waal
+                Demo card · Not a valid student ID
               </div>
 
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 6, marginTop: 6 }}>
@@ -790,8 +774,8 @@ function WalletTab({ profile, onAddLog, isMobile }: {
       <div className="surface" style={{ margin: "0 16px", padding: 20 }}>
         <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 16, lineHeight: 1.6 }}>
           {platform === "apple"
-            ? "Add your HSRW UniCard to Apple Wallet for tap-to-pay and express access on iPhone, Apple Watch, and Mac."
-            : "Add your HSRW UniCard to Google Wallet for contactless access on Android phones and smartwatches."}
+            ? "Demo: shows how adding a UniCard to Apple Wallet could work. No real pass is created."
+            : "Demo: shows how adding a UniCard to Google Wallet could work. No real pass is created."}
         </p>
 
         {/* Device detection pill */}
@@ -853,7 +837,7 @@ function WalletTab({ profile, onAddLog, isMobile }: {
             <div className="sheet-handle" />
             <p className="sheet-title" style={{ textAlign: "center" }}>Deutschlandsemesterticket</p>
             <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-muted)", marginBottom: 20 }}>
-              VRR SemesterTicket · Hochschule Rhein-Waal
+              Demo ticket · not valid for travel
             </p>
 
             <div className="qr-ticket-bg">
@@ -1002,11 +986,11 @@ export default function Home() {
         {/* Logo block */}
         <div className="top-bar-logo">
           {/* variant="dark" → white logo visible on navy background */}
-          <HSRWMark size={isMobile ? 30 : 38} variant="dark" />
+          <UniCardMark size={isMobile ? 30 : 38} variant="dark" />
           <div className="top-bar-wordmark">
-            <span style={{ fontSize: isMobile ? 12 : 14 }}>HSRW UniCard</span>
+            <span style={{ fontSize: isMobile ? 12 : 14 }}>UniCard</span>
             <span style={{ fontSize: isMobile ? 9 : 10 }}>
-              {isMobile ? tabTitle[tab] : "Rhine-Waal University"}
+              {isMobile ? tabTitle[tab] : "Unofficial demo"}
             </span>
           </div>
         </div>
@@ -1072,7 +1056,7 @@ export default function Home() {
 
       {/* ── Content ── */}
       <main className="app-content">
-        <h1 className="sr-only">{tabTitle[tab]} — HSRW UniCard</h1>
+        <h1 className="sr-only">{tabTitle[tab]}, UniCard demo</h1>
         {tab === "card"    && <PersonalTab profile={profile} onBlock={handleBlock} onReportLost={handleReportLost} />}
         {tab === "library" && <LibraryTab  profile={profile} books={books} onUpdateBooks={setBooks} />}
         {tab === "mensa"   && <MensaTab    profile={profile} balance={balance} transactions={transactions} onUpdateBalance={setBalance} onAddTransaction={tx => setTransactions(p => [tx, ...p])} />}
