@@ -57,7 +57,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
     setTimeout(() => setBioStep(2), 2300);
       setTimeout(() => {
         setBioOpen(false);
-        onLoginSuccess("mushfiqur.joy@hsrw.org", "Mushfiqur Joy");
+        onLoginSuccess("max.mustermann@hsrw.org", "Max Mustermann");
       }, 3100);
   };
 
@@ -82,7 +82,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
             UniCard Portal
           </h1>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", marginTop: 4, lineHeight: 1.5 }}>
-            Your unified digital student identity card
+            Unofficial concept demo of a digital student card
           </p>
         </div>
 
@@ -116,11 +116,13 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
                 className="input"
                 type={showPw ? "text" : "password"}
                 /* Bullets here looked like a pre-filled password, so people
-                   pressed Sign In and hit the length error. State the rule. */
-                placeholder="At least 4 characters"
+                   pressed Sign In and hit the length error. State the rule.
+                   Demo: any text works, and autocomplete is off so password
+                   managers don't offer a real university password here. */
+                placeholder="Any 4+ characters (demo)"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(""); }}
-                autoComplete="current-password"
+                autoComplete="off"
                 style={{ paddingRight: 48 }}
               />
               <button
@@ -208,7 +210,7 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
           <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" style={{ flexShrink: 0 }}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
-          Protected by HSRW Single Sign-On
+          Demo only: nothing you type is sent anywhere
         </div>
       </div>
 
@@ -260,13 +262,13 @@ export default function LoginView({ onLoginSuccess }: LoginViewProps) {
             <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 6 }}>
               {bioStep === 0 && "Look directly at your device"}
               {bioStep === 1 && "Checking biometric signature"}
-              {bioStep === 2 && "Welcome back, Mushfiqur!"}
+              {bioStep === 2 && "Welcome back, Max!"}
             </p>
 
             {/* HSRW branding strip */}
             <div style={{ marginTop: 24, padding: "10px", background: "var(--bg-app)", borderRadius: 10, display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
               <HSRWMark size={22} variant="light" />
-              <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>HSRW Secure Biometric Login</span>
+              <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 600 }}>Simulated biometric login (demo)</span>
             </div>
           </div>
         </div>

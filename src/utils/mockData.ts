@@ -40,14 +40,15 @@ export interface AuditLog {
 
 // Initial Data
 export const INITIAL_PROFILE: StudentProfile = {
-  name: "Mushfiqur Joy",
-  email: "mushfiqur.joy@hsrw.org",
-  studentId: "32363",
-  birthDate: "04.12.2001",
+  // Fictional demo student (German standard placeholder name).
+  name: "Max Mustermann",
+  email: "max.mustermann@hsrw.org",
+  studentId: "12345",
+  birthDate: "01.01.2000",
   degreeProgram: "B.Sc in Mobility & Logistics",
   campus: "Kamp-Lintfort",
   validUntil: "30.09.2026",
-  cardSerial: "HSRW-9847-32363",
+  cardSerial: "DEMO-0000-12345",
   chipUid: "04:A2:F3:8C:55:6A:80",
   isBlocked: false,
   isLost: false,

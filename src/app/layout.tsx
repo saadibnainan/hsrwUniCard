@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import DemoBanner from "@/components/DemoBanner";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,26 +9,28 @@ const inter = Inter({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "Unofficial student concept demo of a digital campus card: student ID, library, mensa balance and Semesterticket in one web app. Not affiliated with Hochschule Rhein-Waal. All data is fictional.";
+
 export const metadata: Metadata = {
-  title: "HSRW UniCard | Rhine-Waal University of Applied Sciences",
-  description:
-    "Your unified digital student identity card for Hochschule Rhein-Waal — Deutschlandsemesterticket, Mensa smart wallet, Library pass, and NFC access in one secure app.",
-  keywords: ["HSRW", "Hochschule Rhein-Waal", "student card", "UniCard", "Mensa", "Library", "Deutschlandticket", "NFC"],
-  applicationName: "HSRW UniCard",
-  authors: [{ name: "Hochschule Rhein-Waal" }],
+  title: "UniCard (unofficial demo) | Student concept",
+  description: DESCRIPTION,
+  keywords: ["UniCard", "student card concept", "demo", "Mensa", "Library", "Deutschlandticket", "NFC"],
+  applicationName: "UniCard Demo",
+  authors: [{ name: "Mohammad Saad Ibna Inan", url: "https://www.saadibnainan.tech" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "HSRW UniCard",
+    title: "UniCard Demo",
   },
   openGraph: {
     type: "website",
     locale: "de_DE",
     alternateLocale: "en_GB",
-    title: "HSRW UniCard",
-    description: "Unified digital student card for Rhine-Waal University.",
-    siteName: "HSRW UniCard Portal",
+    title: "UniCard (unofficial demo)",
+    description: DESCRIPTION,
+    siteName: "UniCard Demo",
   },
 };
 
@@ -45,7 +48,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
-      <body style={{ height: "100%" }}>{children}</body>
+      <body style={{ height: "100%" }}>
+        <DemoBanner />
+        {children}
+      </body>
     </html>
   );
 }
