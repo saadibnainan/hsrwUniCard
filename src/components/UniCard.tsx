@@ -97,8 +97,8 @@ export default function UniCard({ profile }: UniCardProps) {
             {/* Header info */}
             <div className="flex justify-between items-start z-10">
               <div>
-                <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-cyan-400 block">Hochschule Rhein-Waal</span>
-                <span className="text-[8px] uppercase tracking-widest text-slate-400 block font-mono">Rhine-Waal University of Applied Sciences</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-cyan-400 block">UniCard demo</span>
+                <span className="text-[8px] uppercase tracking-widest text-slate-400 block font-mono">Not a valid student ID</span>
               </div>
               <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded px-1.5 py-0.5">
                 <div className="card-chip"></div>

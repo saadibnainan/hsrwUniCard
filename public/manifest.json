@@ -1,7 +1,7 @@
 {
-  "name": "HSRW UniCard",
+  "name": "UniCard (unofficial demo)",
   "short_name": "UniCard",
-  "description": "Unified digital student identity card for Hochschule Rhein-Waal — Deutschlandsemesterticket, Mensa wallet, Library pass, and NFC access.",
+  "description": "Unofficial student concept demo of a digital campus card. Not affiliated with Hochschule Rhein-Waal. All data is fictional.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

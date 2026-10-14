@@ -67,10 +67,10 @@ export default function WalletPass({ profile, onAddLog }: WalletPassProps) {
   const confirmAdd = () => {
     if (activeWallet === "apple") {
       setIsAppleAdded(true);
-      onAddLog("SECURITY", "HSRW Digital UniCard cryptographic pass signed and loaded into Apple Wallet Secure Element.");
+      onAddLog("SECURITY", "Simulated: demo UniCard pass added to Apple Wallet (no real pass is created).");
     } else {
       setIsGoogleAdded(true);
-      onAddLog("SECURITY", "HSRW Digital UniCard loaded into Google Wallet API client database.");
+      onAddLog("SECURITY", "Simulated: demo UniCard pass added to Google Wallet (no real pass is created).");
     }
     playChime();
     setActiveWallet(null);
@@ -158,13 +158,13 @@ export default function WalletPass({ profile, onAddLog }: WalletPassProps) {
               Add to {activeWallet === "apple" ? "Apple Wallet" : "Google Wallet"}?
             </h4>
             <p className="text-sm text-slate-400 text-center mt-2 leading-relaxed">
-              This will add a secure, cryptographically signed replica of your Hochschule Rhein-Waal Student Card for local contactless use.
+              Demo only. This simulates adding a student card pass; no real wallet pass is created.
             </p>
 
             {/* Micro Wallet Pass Mockup */}
             <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 mt-6 flex flex-col gap-2">
               <div className="flex justify-between items-center text-[10px] text-cyan-400 font-mono">
-                <span>HOCHSCHULE RHEIN-WAAL</span>
+                <span>UNICARD DEMO</span>
                 <span>STUDENT ID</span>
               </div>
               <div className="text-sm font-bold text-slate-200">{profile.name}</div>
